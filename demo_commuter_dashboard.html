@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Jeepney Tracking — Commuter Dashboard (Demo)</title>
+    <link rel="stylesheet" href="src/output.css" />
+    <!-- Leaflet CSS for interactive maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 400px; width: 100%; }
+        .speed-display { font-family: 'Courier New', monospace; }
+        .seat-available { background-color: #10b981; }
+        .seat-occupied { background-color: #ef4444; }
+        .seat-unavailable { background-color: #6b7280; }
+    </style>
+</head>
+
+<body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md border-b border-slate-200/60 dark:bg-slate-900/80 dark:border-slate-800/60 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="grid h-8 w-8 place-items-center rounded-xl border border-slate-200 bg-gradient-to-b from-sky-200/40 to-transparent text-[10px] font-bold tracking-wide dark:border-slate-800 dark:from-sky-400/20">
+                            JT</div>
+                        <span class="font-bold text-lg">Jeepney Tracking</span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-lg text-sm font-medium dark:bg-blue-900 dark:text-blue-200">Commuter</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-slate-600 dark:text-slate-400">Welcome, demo_user</span>
+                    <a href="#" class="text-sm bg-red-100 hover:bg-red-200 text-red-700 px-3 py-2 rounded-lg transition dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Dashboard Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100">Commuter Dashboard</h1>
+            <p class="text-slate-600 dark:text-slate-400 mt-2">Track jeepney locations, check seat availability, and monitor real-time information.</p>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white/70 dark:bg-slate-800/70 rounded-xl p-6 border border-slate-200/60 dark:border-slate-700/60 backdrop-blur-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">Active Jeepneys</p>
+                        <p class="text-2xl font-bold" id="active-jeepneys">12</p>
+                    </div>
+                    <div class="h-12 w-12 bg-green-100 dark:bg-green-900/20 rounded-xl flex items-center justify-center">
+                        <svg class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/70 dark:bg-slate-800/70 rounded-xl p-6 border border-slate-200/60 dark:border-slate-700/60 backdrop-blur-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">Available Seats</p>
+                        <p class="text-2xl font-bold" id="available-seats">24</p>
+                    </div>
+                    <div class="h-12 w-12 bg-blue-100 dark:bg-blue-900/20 rounded-xl flex items-center justify-center">
+                        <svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/70 dark:bg-slate-800/70 rounded-xl p-6 border border-slate-200/60 dark:border-slate-700/60 backdrop-blur-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">Average Speed</p>
+                        <p class="text-2xl font-bold speed-display"><span id="avg-speed">25</span> km/h</p>
+                    </div>
+                    <div class="h-12 w-12 bg-orange-100 dark:bg-orange-900/20 rounded-xl flex items-center justify-center">
+                        <svg class="h-6 w-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Interactive Map -->
+            <div class="bg-white/70 dark:bg-slate-800/70 rounded-xl border border-slate-200/60 dark:border-slate-700/60 backdrop-blur-sm overflow-hidden">
+                <div class="p-6 border-b border-slate-200/60 dark:border-slate-700/60">
+                    <h2 class="text-xl font-semibold">Live Jeepney Locations</h2>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">Real-time tracking of active jeepneys</p>
+                </div>
+                <div class="p-6">
+                    <div id="map" class="rounded-lg border border-slate-200 dark:border-slate-600"></div>
+                </div>
+            </div>
+
+            <!-- Jeepney List & Seat Availability -->
+            <div class="space-y-6">
+                <!-- Current Speed Display -->
+                <div class="bg-white/70 dark:bg-slate-800/70 rounded-xl p-6 border border-slate-200/60 dark:border-slate-700/60 backdrop-blur-sm">
+                    <h3 class="text-lg font-semibold mb-4">Speed Monitor</h3>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold speed-display mb-2">
+                            <span id="current-speed">32</span> <span class="text-2xl">km/h</span>
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-400">Selected Jeepney Speed</p>
+                    </div>
+                </div>
+
+                <!-- Seat Availability -->
+                <div class="bg-white/70 dark:bg-slate-800/70 rounded-xl p-6 border border-slate-200/60 dark:border-slate-700/60 backdrop-blur-sm">
+                    <h3 class="text-lg font-semibold mb-4">Seat Availability</h3>
+                    
+                    <!-- Jeepney Selection -->
+                    <div class="mb-4">
+                        <label for="jeepney-select" class="block text-sm font-medium mb-2">Select Jeepney:</label>
+                        <select id="jeepney-select" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-700">
+                            <option value="jp001">JP-001 (Route: Divisoria-Mabolo)</option>
+                            <option value="jp002">JP-002 (Route: Lahug-Colon)</option>
+                            <option value="jp003">JP-003 (Route: Talamban-IT Park)</option>
+                        </select>
+                    </div>
+
+                    <!-- Seat Map -->
+                    <div class="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4">
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">Seat Layout (JP-001):</p>
+                        <div class="grid grid-cols-2 gap-2 max-w-48 mx-auto" id="seat-layout">
+                            <!-- Left side seats -->
+                            <div class="space-y-2">
+                                <div class="seat-available h-8 w-8 rounded border-2 border-white flex items-center justify-center text-xs font-bold text-white cursor-pointer" data-seat="1">1</div>
+                                <div class="seat-occupied h-8 w-8 rounded border-2 border-white flex items-center justify-center text-xs font-bold text-white" data-seat="3">3</div>
+                                <div class="seat-available h-8 w-8 rounded border-2 border-white flex items-center justify-center text-xs font-bold text-white cursor-pointer" data-seat="5">5</div>
+                                <div class="seat-available h-8 w-8 rounded border-2 border-white flex items-center justify-center text-xs font-bold text-white cursor-pointer" data-seat="7">7</div>
+                            </div>
+                            <!-- Right side seats -->
+                            <div class="space-y-2">
+                                <div class="seat-available h-8 w-8 rounded border-2 border-white flex items-center justify-center text-xs font-bold text-white cursor-pointer" data-seat="2">2</div>
+                                <div class="seat-available h-8 w-8 rounded border-2 border-white flex items-center justify-center text-xs font-bold text-white cursor-pointer" data-seat="4">4</div>
+                                <div class="seat-occupied h-8 w-8 rounded border-2 border-white flex items-center justify-center text-xs font-bold text-white" data-seat="6">6</div>
+                                <div class="seat-available h-8 w-8 rounded border-2 border-white flex items-center justify-center text-xs font-bold text-white cursor-pointer" data-seat="8">8</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Legend -->
+                        <div class="flex justify-center gap-4 mt-4 text-xs">
+                            <div class="flex items-center gap-1">
+                                <div class="seat-available h-3 w-3 rounded"></div>
+                                <span>Available</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <div class="seat-occupied h-3 w-3 rounded"></div>
+                                <span>Occupied</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialize map
+        const map = L.map('map').setView([10.3157, 123.8854], 13); // Cebu City coordinates
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Sample jeepney locations
+        const jeepneyData = {
+            'jp001': { lat: 10.3157, lng: 123.8854, speed: 28, seats: 6, route: 'Divisoria → Mabolo' },
+            'jp002': { lat: 10.3200, lng: 123.8900, speed: 22, seats: 4, route: 'Lahug → Colon' },
+            'jp003': { lat: 10.3100, lng: 123.8800, speed: 35, seats: 0, route: 'Talamban → IT Park' }
+        };
+
+        // Add jeepney markers to map
+        Object.keys(jeepneyData).forEach(jeepneyId => {
+            const data = jeepneyData[jeepneyId];
+            const marker = L.marker([data.lat, data.lng]).addTo(map);
+            marker.bindPopup(`
+                <strong>${jeepneyId.toUpperCase()}</strong><br>
+                Route: ${data.route}<br>
+                Speed: ${data.speed} km/h<br>
+                Available Seats: ${data.seats}
+            `);
+        });
+    </script>
+</body>
+
+</html>

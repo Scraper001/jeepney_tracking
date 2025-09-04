@@ -13,6 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
     $confirm = $_POST['confirm'];
     $address = $_POST['address'];
+    $user_type = isset($_POST['user_type']) ? trim($_POST['user_type']) : 'user';
 
     // Get individual address components if available
     $region = isset($_POST['region']) ? trim($_POST['region']) : '';
@@ -50,6 +51,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (empty($address)) {
         $errors[] = "Address is required";
+    }
+
+    // Validate user type
+    $allowed_user_types = ['user', 'driver', 'admin'];
+    if (!in_array($user_type, $allowed_user_types)) {
+        $errors[] = "Invalid account type selected";
     }
 
     // If there are validation errors
@@ -115,7 +122,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Hash password
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     $date_created = time();
-    $user_type = "user";
+    // Use the user_type from the form instead of hardcoded "user"
 
     // Insert new user
     $insert_query = "INSERT INTO user_tbl (firstname, lastname, address, password, username, date_created, usert_type, 
