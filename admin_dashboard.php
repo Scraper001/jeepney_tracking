@@ -84,6 +84,29 @@ mysqli_close($conn);
             <p class="text-slate-600 dark:text-slate-400 mt-2">Manage drivers, monitor system activity, and oversee jeepney operations.</p>
         </div>
 
+        <!-- Success/Error Messages -->
+        <?php if (isset($_SESSION['register_success'])): ?>
+        <div class="mb-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/30 rounded-xl p-4">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 text-green-600 dark:text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <p class="text-green-800 dark:text-green-400"><?php echo htmlspecialchars($_SESSION['register_success']); unset($_SESSION['register_success']); ?></p>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['register_error'])): ?>
+        <div class="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 rounded-xl p-4">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 text-red-600 dark:text-red-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                <p class="text-red-800 dark:text-red-400"><?php echo htmlspecialchars($_SESSION['register_error']); unset($_SESSION['register_error']); ?></p>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <!-- System Statistics -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="bg-white/70 dark:bg-slate-800/70 rounded-xl p-6 border border-slate-200/60 dark:border-slate-700/60 backdrop-blur-sm">
@@ -152,7 +175,7 @@ mysqli_close($conn);
                     <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">Add a new driver to the system</p>
                 </div>
                 <div class="p-6">
-                    <form id="driver-registration-form" class="space-y-4">
+                    <form id="driver-registration-form" action="backend/admin_register_driver.php" method="POST" class="space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label for="driver-firstname" class="block text-sm font-medium mb-1">First Name</label>
@@ -376,32 +399,19 @@ mysqli_close($conn);
 
         // Driver registration form handling
         document.getElementById('driver-registration-form').addEventListener('submit', function(e) {
-            e.preventDefault();
+            // Let the form submit normally to the backend - no prevent default
             
-            const formData = new FormData(this);
-            formData.append('user_type', 'driver');
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Registering...';
             
-            // In a real application, this would send to server
-            Swal.fire({
-                title: 'Registering Driver...',
-                text: 'Please wait while we create the driver account.',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            // Simulate API call
+            // Re-enable the button after a delay in case of redirect
             setTimeout(() => {
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Driver has been registered successfully.',
-                    icon: 'success'
-                }).then(() => {
-                    this.reset();
-                    location.reload(); // Reload to show new driver
-                });
-            }, 2000);
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }, 3000);
         });
 
         // Edit driver functionality
