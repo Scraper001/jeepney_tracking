@@ -190,6 +190,18 @@ session_start();
                     </p>
                 </div>
 
+                <div id="f-usertype" class="grid gap-2">
+                    <label for="user_type" class="text-[13px] font-semibold">Account Type</label>
+                    <select id="user_type" name="user_type" required
+                        class="w-full rounded-xl border border-slate-200 bg-white/60 px-4 py-3 text-[15px] text-slate-900 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-200/60 dark:border-slate-800 dark:bg-transparent dark:text-slate-100 dark:focus:border-sky-500 dark:focus:ring-sky-400/20">
+                        <option value="">Select Account Type</option>
+                        <option value="user">Commuter</option>
+                        <option value="driver">Jeepney Driver</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                    <p id="usertype-error" class="hidden text-xs text-red-500">Please select an account type.</p>
+                </div>
+
                 <!-- Location dropdowns with loading indicators -->
                 <div id="f-region" class="grid gap-2">
                     <label for="region" class="text-[13px] font-semibold flex items-center">
@@ -335,6 +347,7 @@ session_start();
             const firstname = document.getElementById('firstname');
             const lastname = document.getElementById('lastname');
             const username = document.getElementById('username');
+            const userType = document.getElementById('user_type');
             const region = document.getElementById('region');
             const municipality = document.getElementById('municipality');
             const barangay = document.getElementById('barangay');
@@ -347,6 +360,7 @@ session_start();
             const firstnameErr = document.getElementById('firstname-error');
             const lastnameErr = document.getElementById('lastname-error');
             const userErr = document.getElementById('username-error');
+            const userTypeErr = document.getElementById('usertype-error');
             const regionErr = document.getElementById('region-error');
             const municipalityErr = document.getElementById('municipality-error');
             const barangayErr = document.getElementById('barangay-error');
@@ -673,6 +687,13 @@ session_start();
                     "Use 3+ letters, numbers, or underscores"
                 );
 
+                const userTypeValid = validateInput(
+                    userType,
+                    userTypeErr,
+                    (value) => value !== '',
+                    "Please select an account type"
+                );
+
                 const regionValid = validateInput(
                     region,
                     regionErr,
@@ -728,7 +749,7 @@ session_start();
                 const termsValid = terms.checked;
                 termsErr.classList.toggle('hidden', termsValid);
 
-                return firstnameValid && lastnameValid && usernameValid &&
+                return firstnameValid && lastnameValid && usernameValid && userTypeValid &&
                     regionValid && municipalityValid && barangayValid && barangaySelectValid &&
                     streetValid && passwordValid && confirmValid && termsValid;
             };
