@@ -165,29 +165,46 @@ session_start();
                 </div>
             <?php endif; ?>
 
-            <form id="register-form" action="backend/register_process.php" method="POST" class="grid gap-4" novalidate>
+            <form id="register-form" action="backend/register.php" method="POST" class="grid gap-4" novalidate>
+                <!-- Name fields with first name, middle name, and last name -->
                 <div class="grid grid-cols-2 gap-3">
                     <div id="f-firstname" class="grid gap-2">
                         <label for="firstname" class="text-[13px] font-semibold">First Name</label>
-                        <input id="firstname" name="firstname" type="text" placeholder="Juan" required
+                        <input id="firstname" name="fname" type="text" placeholder="Juan" required
                             class="w-full rounded-xl border border-slate-200 bg-white/60 px-4 py-3 text-[15px] text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-200/60 dark:border-slate-800 dark:bg-transparent dark:text-slate-100 dark:focus:border-sky-500 dark:focus:ring-sky-400/20" />
                         <p id="firstname-error" class="hidden text-xs text-red-500">Enter your first name.</p>
                     </div>
 
                     <div id="f-lastname" class="grid gap-2">
                         <label for="lastname" class="text-[13px] font-semibold">Last Name</label>
-                        <input id="lastname" name="lastname" type="text" placeholder="Dela Cruz" required
+                        <input id="lastname" name="lname" type="text" placeholder="Dela Cruz" required
                             class="w-full rounded-xl border border-slate-200 bg-white/60 px-4 py-3 text-[15px] text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-200/60 dark:border-slate-800 dark:bg-transparent dark:text-slate-100 dark:focus:border-sky-500 dark:focus:ring-sky-400/20" />
                         <p id="lastname-error" class="hidden text-xs text-red-500">Enter your last name.</p>
                     </div>
                 </div>
 
-                <div id="f-username" class="grid gap-2">
-                    <label for="username" class="text-[13px] font-semibold">Username</label>
-                    <input id="username" name="username" type="text" placeholder="jeepfan_01" required
+                <!-- Middle name field -->
+                <div id="f-middlename" class="grid gap-2">
+                    <label for="middlename" class="text-[13px] font-semibold">Middle Name <span class="text-slate-400">(Optional)</span></label>
+                    <input id="middlename" name="mname" type="text" placeholder="Santos"
                         class="w-full rounded-xl border border-slate-200 bg-white/60 px-4 py-3 text-[15px] text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-200/60 dark:border-slate-800 dark:bg-transparent dark:text-slate-100 dark:focus:border-sky-500 dark:focus:ring-sky-400/20" />
-                    <p id="username-error" class="hidden text-xs text-red-500">Use 3+ letters, numbers, or underscores.
-                    </p>
+                </div>
+
+                <!-- Email and Phone fields -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div id="f-email" class="grid gap-2">
+                        <label for="email" class="text-[13px] font-semibold">Email Address</label>
+                        <input id="email" name="email" type="email" placeholder="juan@example.com" required
+                            class="w-full rounded-xl border border-slate-200 bg-white/60 px-4 py-3 text-[15px] text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-200/60 dark:border-slate-800 dark:bg-transparent dark:text-slate-100 dark:focus:border-sky-500 dark:focus:ring-sky-400/20" />
+                        <p id="email-error" class="hidden text-xs text-red-500">Enter a valid email address.</p>
+                    </div>
+
+                    <div id="f-phone" class="grid gap-2">
+                        <label for="phone" class="text-[13px] font-semibold">Phone Number</label>
+                        <input id="phone" name="phone" type="tel" placeholder="09123456789" required
+                            class="w-full rounded-xl border border-slate-200 bg-white/60 px-4 py-3 text-[15px] text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-200/60 dark:border-slate-800 dark:bg-transparent dark:text-slate-100 dark:focus:border-sky-500 dark:focus:ring-sky-400/20" />
+                        <p id="phone-error" class="hidden text-xs text-red-500">Enter a valid phone number.</p>
+                    </div>
                 </div>
 
                 <!-- Location dropdowns with loading indicators -->
@@ -207,7 +224,7 @@ session_start();
                     <label for="municipality" class="text-[13px] font-semibold flex items-center">
                         Province <span id="municipality-loading" class="ml-2 hidden"></span>
                     </label>
-                    <select id="municipality" name="province_code" required disabled
+                    <select id="municipality" name="province" required disabled
                         class="w-full rounded-xl border border-slate-200 bg-white/60 px-4 py-3 text-[15px] text-slate-900 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-200/60 dark:border-slate-800 dark:bg-transparent dark:text-slate-100 dark:focus:border-sky-500 dark:focus:ring-sky-400/20">
                         <option value="">Select Province</option>
                         <!-- Will be populated based on region selection -->
@@ -217,14 +234,14 @@ session_start();
 
                 <div id="f-barangay" class="grid gap-2">
                     <label for="barangay" class="text-[13px] font-semibold flex items-center">
-                        Municipality <span id="barangay-loading" class="ml-2 hidden"></span>
+                        City/Municipality <span id="barangay-loading" class="ml-2 hidden"></span>
                     </label>
-                    <select id="barangay" name="municipality_code" required disabled
+                    <select id="barangay" name="city" required disabled
                         class="w-full rounded-xl border border-slate-200 bg-white/60 px-4 py-3 text-[15px] text-slate-900 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-200/60 dark:border-slate-800 dark:bg-transparent dark:text-slate-100 dark:focus:border-sky-500 dark:focus:ring-sky-400/20">
-                        <option value="">Select Municipality</option>
+                        <option value="">Select City/Municipality</option>
                         <!-- Will be populated based on province selection -->
                     </select>
-                    <p id="barangay-error" class="hidden text-xs text-red-500">Please select a municipality.</p>
+                    <p id="barangay-error" class="hidden text-xs text-red-500">Please select a city/municipality.</p>
                 </div>
 
                 <!-- Barangay dropdown -->
@@ -232,7 +249,7 @@ session_start();
                     <label for="barangay-select" class="text-[13px] font-semibold flex items-center">
                         Barangay <span id="barangay-select-loading" class="ml-2 hidden"></span>
                     </label>
-                    <select id="barangay-select" name="barangay_code" required disabled
+                    <select id="barangay-select" name="barangay" required disabled
                         class="w-full rounded-xl border border-slate-200 bg-white/60 px-4 py-3 text-[15px] text-slate-900 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-200/60 dark:border-slate-800 dark:bg-transparent dark:text-slate-100 dark:focus:border-sky-500 dark:focus:ring-sky-400/20">
                         <option value="">Select Barangay</option>
                     </select>
@@ -245,13 +262,6 @@ session_start();
                         <div class="text-[13px] font-semibold mb-1 text-dark">Address Preview:</div>
                         <div id="address-preview-text" class="text-slate-600 dark:text-dark"></div>
                     </div>
-                </div>
-
-                <div id="f-street" class="grid gap-2">
-                    <label for="street" class="text-[13px] font-semibold">Street Address</label>
-                    <input id="street" name="street" type="text" placeholder="123 Main St." required
-                        class="w-full rounded-xl border border-slate-200 bg-white/60 px-4 py-3 text-[15px] text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-200/60 dark:border-slate-800 dark:bg-transparent dark:text-slate-100 dark:focus:border-sky-500 dark:focus:ring-sky-400/20" />
-                    <p id="street-error" class="hidden text-xs text-red-500">Please enter your street address.</p>
                 </div>
 
                 <div id="f-password" class="grid gap-2">
@@ -331,27 +341,30 @@ session_start();
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Form elements
             const form = document.getElementById('register-form');
             const firstname = document.getElementById('firstname');
             const lastname = document.getElementById('lastname');
-            const username = document.getElementById('username');
+            const middlename = document.getElementById('middlename');
+            const email = document.getElementById('email');
+            const phone = document.getElementById('phone');
             const region = document.getElementById('region');
             const municipality = document.getElementById('municipality');
             const barangay = document.getElementById('barangay');
             const barangaySelect = document.getElementById('barangay-select');
-            const street = document.getElementById('street');
             const password = document.getElementById('password');
             const confirm = document.getElementById('confirm');
             const terms = document.getElementById('terms');
 
+            // Error message elements
             const firstnameErr = document.getElementById('firstname-error');
             const lastnameErr = document.getElementById('lastname-error');
-            const userErr = document.getElementById('username-error');
+            const emailErr = document.getElementById('email-error');
+            const phoneErr = document.getElementById('phone-error');
             const regionErr = document.getElementById('region-error');
             const municipalityErr = document.getElementById('municipality-error');
             const barangayErr = document.getElementById('barangay-error');
             const barangaySelectErr = document.getElementById('barangay-select-error');
-            const streetErr = document.getElementById('street-error');
             const pwErr = document.getElementById('password-error');
             const confErr = document.getElementById('confirm-error');
             const termsErr = document.getElementById('terms-error');
@@ -452,26 +465,37 @@ session_start();
                 passwordStrengthText.classList.add(colors[strength.level]);
             }
 
+            // Email validation function
+            function isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+
+            // Phone validation function (Philippine format)
+            function isValidPhone(phone) {
+                // Remove all non-digits for validation
+                const digits = phone.replace(/\D/g, '');
+                // Check for Philippine mobile formats: 09xxxxxxxxx or +639xxxxxxxxx
+                return /^(09\d{9}|639\d{9})$/.test(digits);
+            }
+
             // Update the address preview
             function updateAddressPreview() {
                 const regionText = region.options[region.selectedIndex]?.text || '';
                 const provinceText = municipality.options[municipality.selectedIndex]?.text || '';
-                const municipalityText = barangay.options[barangay.selectedIndex]?.text || '';
+                const cityText = barangay.options[barangay.selectedIndex]?.text || '';
 
                 let barangayText = '';
                 if (barangaySelect && barangaySelect.selectedIndex > 0) {
                     barangayText = barangaySelect.options[barangaySelect.selectedIndex].text;
                 }
 
-                const streetText = street.value.trim();
-
                 // Only show preview if at least one location field is selected
                 if (regionText && regionText !== 'Select Region') {
                     let previewText = '';
 
-                    if (streetText) previewText += streetText + ', ';
                     if (barangayText && barangayText !== 'Select Barangay') previewText += barangayText + ', ';
-                    if (municipalityText && municipalityText !== 'Select Municipality') previewText += municipalityText + ', ';
+                    if (cityText && cityText !== 'Select City/Municipality') previewText += cityText + ', ';
                     if (provinceText && provinceText !== 'Select Province') previewText += provinceText + ', ';
                     if (regionText) previewText += regionText;
 
@@ -575,7 +599,7 @@ session_start();
 
                     const municipalities = await response.json();
 
-                    barangay.innerHTML = '<option value="">Select Municipality</option>';
+                    barangay.innerHTML = '<option value="">Select City/Municipality</option>';
 
                     municipalities.sort((a, b) => a.name.localeCompare(b.name)).forEach(muni => {
                         const option = document.createElement('option');
@@ -652,6 +676,7 @@ session_start();
 
             // Full validation function
             window.validate = function () {
+                // Validate first name (required, minimum 2 characters)
                 const firstnameValid = validateInput(
                     firstname,
                     firstnameErr,
@@ -659,6 +684,7 @@ session_start();
                     "Please enter your first name"
                 );
 
+                // Validate last name (required, minimum 2 characters)
                 const lastnameValid = validateInput(
                     lastname,
                     lastnameErr,
@@ -666,13 +692,23 @@ session_start();
                     "Please enter your last name"
                 );
 
-                const usernameValid = validateInput(
-                    username,
-                    userErr,
-                    (value) => /^[A-Za-z0-9_]{3,}$/.test(value.trim()),
-                    "Use 3+ letters, numbers, or underscores"
+                // Validate email (required, valid format)
+                const emailValid = validateInput(
+                    email,
+                    emailErr,
+                    (value) => value.trim() !== '' && isValidEmail(value.trim()),
+                    "Please enter a valid email address"
                 );
 
+                // Validate phone (required, valid Philippine format)
+                const phoneValid = validateInput(
+                    phone,
+                    phoneErr,
+                    (value) => value.trim() !== '' && isValidPhone(value.trim()),
+                    "Please enter a valid phone number (e.g., 09123456789)"
+                );
+
+                // Validate region selection
                 const regionValid = validateInput(
                     region,
                     regionErr,
@@ -680,6 +716,7 @@ session_start();
                     "Please select a region"
                 );
 
+                // Validate province selection
                 const municipalityValid = validateInput(
                     municipality,
                     municipalityErr,
@@ -687,13 +724,15 @@ session_start();
                     "Please select a province"
                 );
 
+                // Validate city/municipality selection
                 const barangayValid = validateInput(
                     barangay,
                     barangayErr,
                     (value) => value !== '',
-                    "Please select a municipality"
+                    "Please select a city/municipality"
                 );
 
+                // Validate barangay selection (if available and enabled)
                 let barangaySelectValid = true;
                 if (barangaySelect && !barangaySelect.disabled) {
                     barangaySelectValid = validateInput(
@@ -704,13 +743,7 @@ session_start();
                     );
                 }
 
-                const streetValid = validateInput(
-                    street,
-                    streetErr,
-                    (value) => value.trim().length >= 3,
-                    "Please enter your street address"
-                );
-
+                // Validate password (required, minimum 6 characters)
                 const passwordValid = validateInput(
                     password,
                     pwErr,
@@ -718,6 +751,7 @@ session_start();
                     "Password must be at least 6 characters"
                 );
 
+                // Validate password confirmation (must match password)
                 const confirmValid = validateInput(
                     confirm,
                     confErr,
@@ -725,12 +759,14 @@ session_start();
                     "Passwords do not match"
                 );
 
+                // Validate terms acceptance
                 const termsValid = terms.checked;
                 termsErr.classList.toggle('hidden', termsValid);
 
-                return firstnameValid && lastnameValid && usernameValid &&
+                // Return true only if all validations pass
+                return firstnameValid && lastnameValid && emailValid && phoneValid &&
                     regionValid && municipalityValid && barangayValid && barangaySelectValid &&
-                    streetValid && passwordValid && confirmValid && termsValid;
+                    passwordValid && confirmValid && termsValid;
             };
 
             // Event listeners
@@ -750,7 +786,7 @@ session_start();
                 confirm.focus({ preventScroll: true });
             });
 
-            // Update validation status on input
+            // Update validation status on input - First Name
             firstname.addEventListener('input', () => {
                 showError(firstname, firstnameErr, false);
                 validateInput(
@@ -761,6 +797,7 @@ session_start();
                 );
             });
 
+            // Update validation status on input - Last Name
             lastname.addEventListener('input', () => {
                 showError(lastname, lastnameErr, false);
                 validateInput(
@@ -771,25 +808,26 @@ session_start();
                 );
             });
 
-            username.addEventListener('input', () => {
-                showError(username, userErr, false);
+            // Update validation status on input - Email
+            email.addEventListener('input', () => {
+                showError(email, emailErr, false);
                 validateInput(
-                    username,
-                    userErr,
-                    (value) => /^[A-Za-z0-9_]{3,}$/.test(value.trim()),
-                    "Use 3+ letters, numbers, or underscores"
+                    email,
+                    emailErr,
+                    (value) => value.trim() !== '' && isValidEmail(value.trim()),
+                    "Please enter a valid email address"
                 );
             });
 
-            street.addEventListener('input', () => {
-                showError(street, streetErr, false);
+            // Update validation status on input - Phone
+            phone.addEventListener('input', () => {
+                showError(phone, phoneErr, false);
                 validateInput(
-                    street,
-                    streetErr,
-                    (value) => value.trim().length >= 3,
-                    "Please enter your street address"
+                    phone,
+                    phoneErr,
+                    (value) => value.trim() !== '' && isValidPhone(value.trim()),
+                    "Please enter a valid phone number (e.g., 09123456789)"
                 );
-                updateAddressPreview();
             });
 
             password.addEventListener('input', () => {
@@ -851,38 +889,46 @@ session_start();
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
 
+                // Validate all fields before submission
                 if (!validate()) {
+                    // Show validation error using SweetAlert
+                    Swal.fire({
+                        title: 'Validation Error',
+                        text: 'Please check your inputs and ensure all required fields are filled correctly.',
+                        icon: 'error',
+                        confirmButtonColor: '#3085d6',
+                        customClass: {
+                            confirmButton: 'rounded-xl px-4 py-2'
+                        }
+                    });
                     return false;
                 }
 
                 // Get form data
                 const formData = new FormData(form);
 
-                // Create full address
+                // Create full address for display
                 const regionText = region.options[region.selectedIndex].text;
                 const provinceText = municipality.options[municipality.selectedIndex].text;
-                const municipalityText = barangay.options[barangay.selectedIndex].text;
+                const cityText = barangay.options[barangay.selectedIndex].text;
 
                 let barangayText = '';
                 if (barangaySelect && barangaySelect.selectedIndex > 0) {
                     barangayText = barangaySelect.options[barangaySelect.selectedIndex].text;
                 }
 
-                const streetText = street.value.trim();
-
-                let fullAddress = `${streetText}`;
-                if (barangayText) fullAddress += `, ${barangayText}`;
-                fullAddress += `, ${municipalityText}, ${provinceText}, ${regionText}`;
-
-                formData.append('address', fullAddress);
+                let fullAddress = ``;
+                if (barangayText) fullAddress += `${barangayText}, `;
+                fullAddress += `${cityText}, ${provinceText}, ${regionText}`;
 
                 // Show confirmation with SweetAlert2
                 Swal.fire({
                     title: 'Confirm Registration',
                     html: `
                         <div class="text-left">
-                            <p><strong>Name:</strong> ${formData.get('firstname')} ${formData.get('lastname')}</p>
-                            <p><strong>Username:</strong> ${formData.get('username')}</p>
+                            <p><strong>Name:</strong> ${formData.get('fname')} ${formData.get('mname') || ''} ${formData.get('lname')}</p>
+                            <p><strong>Email:</strong> ${formData.get('email')}</p>
+                            <p><strong>Phone:</strong> ${formData.get('phone')}</p>
                             <p><strong>Address:</strong> ${fullAddress}</p>
                         </div>
                     `,
@@ -916,18 +962,10 @@ session_start();
                             .then(response => response.json())
                             .then(data => {
                                 if (data.status === 'success') {
+                                    // Show success message as specified in requirements
                                     Swal.fire({
                                         title: 'Registration Successful!',
-                                        html: `
-                                        <div class="text-center">
-                                            <svg class="mx-auto mb-4" width="64" height="64" viewBox="0 0 24 24">
-                                                <circle cx="12" cy="12" r="10" fill="#22c55e" fill-opacity="0.2"/>
-                                                <path d="M9 12l2 2 4-4" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                                            </svg>
-                                            <p>Your account has been created successfully.</p>
-                                            <p class="text-sm text-slate-500 mt-2">You can now sign in with your credentials.</p>
-                                        </div>
-                                    `,
+                                        text: 'Your account has been created!',
                                         icon: 'success',
                                         showConfirmButton: true,
                                         confirmButtonText: 'Go to Login',
@@ -939,9 +977,10 @@ session_start();
                                         window.location.href = 'login.php';
                                     });
                                 } else {
+                                    // Show error message as specified in requirements
                                     Swal.fire({
                                         title: 'Registration Failed',
-                                        text: data.message || 'Something went wrong. Please try again.',
+                                        text: 'Please try again later.',
                                         icon: 'error',
                                         confirmButtonColor: '#3085d6',
                                         customClass: {
@@ -952,9 +991,10 @@ session_start();
                             })
                             .catch(error => {
                                 console.error('Error:', error);
+                                // Show server error message as specified in requirements
                                 Swal.fire({
-                                    title: 'Error',
-                                    text: 'A network error occurred. Please try again.',
+                                    title: 'Registration Failed',
+                                    text: 'Please try again later.',
                                     icon: 'error',
                                     confirmButtonColor: '#3085d6',
                                     customClass: {
