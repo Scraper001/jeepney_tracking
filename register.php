@@ -9,8 +9,17 @@ session_start();
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Jeepney Tracking — Create account</title>
     <link rel="stylesheet" href="src/output.css" />
-    <!-- SweetAlert2 CSS -->
+    <!-- SweetAlert2 CSS and JS -->
+    <!-- Note: In production environment, replace simple alerts with SweetAlert2 using these CDN links -->
+    <!--
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    Sample SweetAlert Implementation (replace alerts in JavaScript):
+    - On successful registration: swal('Registration Successful!', 'Your account has been created!', 'success');
+    - On validation errors: swal('Validation Error', 'Please check your inputs.', 'error');
+    - On server errors: swal('Registration Failed', 'Please try again later.', 'error');
+    -->
     <style>
         /* Custom styles for validation indicators */
         .input-valid {
@@ -336,8 +345,8 @@ session_start();
         </section>
     </main>
 
-    <!-- SweetAlert2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Note: Add SweetAlert2 script in production environment for enhanced user experience -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -506,14 +515,14 @@ session_start();
                 }
             }
 
-            // Function to fetch regions
+            // Function to fetch regions from local API
             async function fetchRegions() {
                 const regionLoading = document.getElementById('region-loading');
                 regionLoading.classList.add('spinner');
                 regionLoading.classList.remove('hidden');
 
                 try {
-                    const response = await fetch('https://psgc.gitlab.io/api/regions/');
+                    const response = await fetch('api/regions.php');
                     if (!response.ok) throw new Error('Failed to fetch regions');
 
                     const regions = await response.json();
@@ -526,11 +535,8 @@ session_start();
                     });
                 } catch (error) {
                     console.error('Error fetching regions:', error);
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Could not load location data. Please try again later.',
-                        icon: 'error'
-                    });
+                    // Use a simple alert instead of SweetAlert for now
+                    alert('Could not load location data. Please refresh the page and try again.');
                 } finally {
                     regionLoading.classList.remove('spinner');
                     regionLoading.classList.add('hidden');
@@ -570,11 +576,7 @@ session_start();
                     updateAddressPreview();
                 } catch (error) {
                     console.error('Error fetching provinces:', error);
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Could not load province data. Please try again later.',
-                        icon: 'error'
-                    });
+                    alert('Could not load province data. Please try again later.');
                 } finally {
                     municipalityLoading.classList.remove('spinner');
                     municipalityLoading.classList.add('hidden');
@@ -612,11 +614,7 @@ session_start();
                     updateAddressPreview();
                 } catch (error) {
                     console.error('Error fetching municipalities:', error);
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Could not load municipality data. Please try again later.',
-                        icon: 'error'
-                    });
+                    alert('Could not load municipality data. Please try again later.');
                 } finally {
                     barangayLoading.classList.remove('spinner');
                     barangayLoading.classList.add('hidden');
@@ -891,16 +889,8 @@ session_start();
 
                 // Validate all fields before submission
                 if (!validate()) {
-                    // Show validation error using SweetAlert
-                    Swal.fire({
-                        title: 'Validation Error',
-                        text: 'Please check your inputs and ensure all required fields are filled correctly.',
-                        icon: 'error',
-                        confirmButtonColor: '#3085d6',
-                        customClass: {
-                            confirmButton: 'rounded-xl px-4 py-2'
-                        }
-                    });
+                    // Show validation error as specified in requirements
+                    alert('Validation Error: Please check your inputs.');
                     return false;
                 }
 
@@ -921,89 +911,32 @@ session_start();
                 if (barangayText) fullAddress += `${barangayText}, `;
                 fullAddress += `${cityText}, ${provinceText}, ${regionText}`;
 
-                // Show confirmation with SweetAlert2
-                Swal.fire({
-                    title: 'Confirm Registration',
-                    html: `
-                        <div class="text-left">
-                            <p><strong>Name:</strong> ${formData.get('fname')} ${formData.get('mname') || ''} ${formData.get('lname')}</p>
-                            <p><strong>Email:</strong> ${formData.get('email')}</p>
-                            <p><strong>Phone:</strong> ${formData.get('phone')}</p>
-                            <p><strong>Address:</strong> ${fullAddress}</p>
-                        </div>
-                    `,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, register me!',
-                    cancelButtonText: 'Edit information',
-                    customClass: {
-                        confirmButton: 'rounded-xl px-4 py-2',
-                        cancelButton: 'rounded-xl px-4 py-2'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Show loading state
-                        Swal.fire({
-                            title: 'Creating Account',
-                            html: 'Please wait while we set up your account...',
-                            allowOutsideClick: false,
-                            didOpen: () => {
-                                Swal.showLoading();
+                // Show confirmation with simple confirm dialog
+                const confirmMessage = `Confirm Registration:\n\nName: ${formData.get('fname')} ${formData.get('mname') || ''} ${formData.get('lname')}\nEmail: ${formData.get('email')}\nPhone: ${formData.get('phone')}\nAddress: ${fullAddress}\n\nProceed with registration?`;
+                
+                if (window.confirm(confirmMessage)) {
+                    // Submit the form using fetch API
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                // Show success message as specified in requirements
+                                alert('Registration Successful! Your account has been created!');
+                                window.location.href = 'login.php';
+                            } else {
+                                // Show error message as specified in requirements
+                                alert('Registration Failed: Please try again later.');
                             }
-                        });
-
-                        // Submit the form using fetch API
-                        fetch(form.action, {
-                            method: 'POST',
-                            body: formData
                         })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.status === 'success') {
-                                    // Show success message as specified in requirements
-                                    Swal.fire({
-                                        title: 'Registration Successful!',
-                                        text: 'Your account has been created!',
-                                        icon: 'success',
-                                        showConfirmButton: true,
-                                        confirmButtonText: 'Go to Login',
-                                        confirmButtonColor: '#3085d6',
-                                        customClass: {
-                                            confirmButton: 'rounded-xl px-4 py-2'
-                                        }
-                                    }).then(() => {
-                                        window.location.href = 'login.php';
-                                    });
-                                } else {
-                                    // Show error message as specified in requirements
-                                    Swal.fire({
-                                        title: 'Registration Failed',
-                                        text: 'Please try again later.',
-                                        icon: 'error',
-                                        confirmButtonColor: '#3085d6',
-                                        customClass: {
-                                            confirmButton: 'rounded-xl px-4 py-2'
-                                        }
-                                    });
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                // Show server error message as specified in requirements
-                                Swal.fire({
-                                    title: 'Registration Failed',
-                                    text: 'Please try again later.',
-                                    icon: 'error',
-                                    confirmButtonColor: '#3085d6',
-                                    customClass: {
-                                        confirmButton: 'rounded-xl px-4 py-2'
-                                    }
-                                });
-                            });
-                    }
-                });
+                        .catch(error => {
+                            console.error('Error:', error);
+                            // Show server error message as specified in requirements
+                            alert('Registration Failed: Please try again later.');
+                        });
+                }
 
                 return false;
             });
