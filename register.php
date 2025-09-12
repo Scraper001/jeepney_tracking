@@ -11,6 +11,54 @@ session_start();
     <link rel="stylesheet" href="src/output.css" />
     <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
+    <!-- Fallback SweetAlert styles if CDN fails -->
+    <style id="swal-fallback" style="display: none;">
+        .swal-fallback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            z-index: 10000;
+            text-align: center;
+            max-width: 400px;
+            border: 1px solid #e5e7eb;
+        }
+        .swal-fallback h2 {
+            margin: 0 0 10px 0;
+            color: #374151;
+            font-size: 18px;
+        }
+        .swal-fallback p {
+            margin: 0 0 20px 0;
+            color: #6b7280;
+        }
+        .swal-fallback button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .swal-fallback-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+        }
+        .swal-fallback.success h2 { color: #059669; }
+        .swal-fallback.error h2 { color: #dc2626; }
+        .swal-fallback.success button { background: #059669; }
+        .swal-fallback.error button { background: #dc2626; }
+    </style>
     <style>
         /* Custom styles for validation indicators */
         .input-valid {
@@ -165,7 +213,7 @@ session_start();
                 </div>
             <?php endif; ?>
 
-            <form id="register-form" action="backend/register_process.php" method="POST" class="grid gap-4" novalidate>
+            <form id="register-form" action="backend/register.php" method="POST" class="grid gap-4" novalidate>
                 <div class="grid grid-cols-2 gap-3">
                     <div id="f-firstname" class="grid gap-2">
                         <label for="firstname" class="text-[13px] font-semibold">First Name</label>
@@ -188,6 +236,22 @@ session_start();
                         class="w-full rounded-xl border border-slate-200 bg-white/60 px-4 py-3 text-[15px] text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-200/60 dark:border-slate-800 dark:bg-transparent dark:text-slate-100 dark:focus:border-sky-500 dark:focus:ring-sky-400/20" />
                     <p id="username-error" class="hidden text-xs text-red-500">Use 3+ letters, numbers, or underscores.
                     </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div id="f-email" class="grid gap-2">
+                        <label for="email" class="text-[13px] font-semibold">Email Address</label>
+                        <input id="email" name="email" type="email" placeholder="juan@example.com" required
+                            class="w-full rounded-xl border border-slate-200 bg-white/60 px-4 py-3 text-[15px] text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-200/60 dark:border-slate-800 dark:bg-transparent dark:text-slate-100 dark:focus:border-sky-500 dark:focus:ring-sky-400/20" />
+                        <p id="email-error" class="hidden text-xs text-red-500">Please enter a valid email address.</p>
+                    </div>
+
+                    <div id="f-phone" class="grid gap-2">
+                        <label for="phone" class="text-[13px] font-semibold">Phone Number</label>
+                        <input id="phone" name="phone" type="tel" placeholder="09123456789" required
+                            class="w-full rounded-xl border border-slate-200 bg-white/60 px-4 py-3 text-[15px] text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-200/60 dark:border-slate-800 dark:bg-transparent dark:text-slate-100 dark:focus:border-sky-500 dark:focus:ring-sky-400/20" />
+                        <p id="phone-error" class="hidden text-xs text-red-500">Please enter a valid phone number.</p>
+                    </div>
                 </div>
 
                 <!-- Location dropdowns with loading indicators -->
@@ -328,6 +392,69 @@ session_start();
 
     <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Fallback SweetAlert implementation -->
+    <script>
+        // Fallback Swal implementation if CDN fails
+        if (typeof Swal === 'undefined') {
+            window.Swal = {
+                fire: function(options) {
+                    return new Promise((resolve) => {
+                        let title, text, icon;
+                        
+                        if (typeof options === 'string') {
+                            title = arguments[0];
+                            text = arguments[1];
+                            icon = arguments[2];
+                        } else {
+                            title = options.title;
+                            text = options.text || options.html;
+                            icon = options.icon;
+                        }
+                        
+                        // Create overlay
+                        const overlay = document.createElement('div');
+                        overlay.className = 'swal-fallback-overlay';
+                        
+                        // Create modal
+                        const modal = document.createElement('div');
+                        modal.className = `swal-fallback ${icon}`;
+                        
+                        const titleEl = document.createElement('h2');
+                        titleEl.textContent = title;
+                        
+                        const textEl = document.createElement('p');
+                        textEl.innerHTML = text;
+                        
+                        const button = document.createElement('button');
+                        button.textContent = 'OK';
+                        button.onclick = () => {
+                            document.body.removeChild(overlay);
+                            resolve({ isConfirmed: true });
+                        };
+                        
+                        modal.appendChild(titleEl);
+                        modal.appendChild(textEl);
+                        modal.appendChild(button);
+                        
+                        overlay.appendChild(modal);
+                        document.body.appendChild(overlay);
+                        
+                        // Auto-close after 5 seconds
+                        setTimeout(() => {
+                            if (overlay.parentNode) {
+                                document.body.removeChild(overlay);
+                                resolve({ isConfirmed: true });
+                            }
+                        }, 5000);
+                    });
+                },
+                showLoading: function() {
+                    console.log('Loading...');
+                }
+            };
+        }
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -335,6 +462,8 @@ session_start();
             const firstname = document.getElementById('firstname');
             const lastname = document.getElementById('lastname');
             const username = document.getElementById('username');
+            const email = document.getElementById('email');
+            const phone = document.getElementById('phone');
             const region = document.getElementById('region');
             const municipality = document.getElementById('municipality');
             const barangay = document.getElementById('barangay');
@@ -347,6 +476,8 @@ session_start();
             const firstnameErr = document.getElementById('firstname-error');
             const lastnameErr = document.getElementById('lastname-error');
             const userErr = document.getElementById('username-error');
+            const emailErr = document.getElementById('email-error');
+            const phoneErr = document.getElementById('phone-error');
             const regionErr = document.getElementById('region-error');
             const municipalityErr = document.getElementById('municipality-error');
             const barangayErr = document.getElementById('barangay-error');
@@ -673,6 +804,20 @@ session_start();
                     "Use 3+ letters, numbers, or underscores"
                 );
 
+                const emailValid = validateInput(
+                    email,
+                    emailErr,
+                    (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()),
+                    "Please enter a valid email address"
+                );
+
+                const phoneValid = validateInput(
+                    phone,
+                    phoneErr,
+                    (value) => /^(\+63|0)\d{10}$/.test(value.replace(/\s/g, '')),
+                    "Please enter a valid phone number (e.g., 09123456789)"
+                );
+
                 const regionValid = validateInput(
                     region,
                     regionErr,
@@ -728,7 +873,7 @@ session_start();
                 const termsValid = terms.checked;
                 termsErr.classList.toggle('hidden', termsValid);
 
-                return firstnameValid && lastnameValid && usernameValid &&
+                return firstnameValid && lastnameValid && usernameValid && emailValid && phoneValid &&
                     regionValid && municipalityValid && barangayValid && barangaySelectValid &&
                     streetValid && passwordValid && confirmValid && termsValid;
             };
@@ -778,6 +923,26 @@ session_start();
                     userErr,
                     (value) => /^[A-Za-z0-9_]{3,}$/.test(value.trim()),
                     "Use 3+ letters, numbers, or underscores"
+                );
+            });
+
+            email.addEventListener('input', () => {
+                showError(email, emailErr, false);
+                validateInput(
+                    email,
+                    emailErr,
+                    (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()),
+                    "Please enter a valid email address"
+                );
+            });
+
+            phone.addEventListener('input', () => {
+                showError(phone, phoneErr, false);
+                validateInput(
+                    phone,
+                    phoneErr,
+                    (value) => /^(\+63|0)\d{10}$/.test(value.replace(/\s/g, '')),
+                    "Please enter a valid phone number (e.g., 09123456789)"
                 );
             });
 
@@ -883,6 +1048,8 @@ session_start();
                         <div class="text-left">
                             <p><strong>Name:</strong> ${formData.get('firstname')} ${formData.get('lastname')}</p>
                             <p><strong>Username:</strong> ${formData.get('username')}</p>
+                            <p><strong>Email:</strong> ${formData.get('email')}</p>
+                            <p><strong>Phone:</strong> ${formData.get('phone')}</p>
                             <p><strong>Address:</strong> ${fullAddress}</p>
                         </div>
                     `,
